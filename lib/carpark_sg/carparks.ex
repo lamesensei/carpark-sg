@@ -19,7 +19,6 @@ defmodule CarparkSg.Carparks do
   """
   def list_carparks do
     Information
-    |> limit(2)
     |> Repo.all()
     |> Repo.preload(:availability)
   end
@@ -120,6 +119,23 @@ defmodule CarparkSg.Carparks do
   """
   def list_carpark_availability do
     Repo.all(Availability)
+    |> Repo.preload(:information)
+    |> Enum.map(fn avail ->
+      avail.carpark_info
+      |> combine_lots
+      |> Map.merge(avail)
+    end)
+  end
+
+  defp combine_lots(capark_info) do
+    capark_info
+    |> Enum.reduce(%{total_lots: 0, available_lots: 0}, fn info, acc ->
+      %{
+        acc
+        | total_lots: String.to_integer(info["total_lots"]) + acc.total_lots,
+          available_lots: String.to_integer(info["lots_available"]) + acc.available_lots
+      }
+    end)
   end
 
   @doc """

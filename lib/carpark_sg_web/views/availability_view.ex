@@ -11,8 +11,14 @@ defmodule CarparkSgWeb.AvailabilityView do
   end
 
   def render("availability.json", %{availability: availability}) do
-    %{id: availability.id,
-      carpark_info: availability.carpark_info,
-      update_datetime: availability.update_datetime}
+    %{
+      # car_park_no: availability.car_park_no,
+      address: availability.information.address,
+      latitude: availability.information.lat,
+      longitude: availability.information.lon,
+      available_lots: availability.available_lots,
+      total_lots: availability.total_lots
+      # update_datetime: availability.update_datetime
+    }
   end
 end

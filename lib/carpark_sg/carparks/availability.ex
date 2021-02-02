@@ -10,7 +10,10 @@ defmodule CarparkSg.Carparks.Availability do
 
     belongs_to :information, Information,
       foreign_key: :car_park_no,
-      type: :string
+      type: :string,
+      primary_key: false,
+      define_field: :car_park_no,
+      references: :car_park_no
 
     timestamps()
   end

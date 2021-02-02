@@ -34,11 +34,6 @@ defmodule CarparkSgWeb.InformationController do
     end
   end
 
-  def nearest(conn, _params) do
-    carparks = Carparks.list_carparks()
-    render(conn, "index.json", carparks: carparks)
-  end
-
   def delete(conn, %{"id" => id}) do
     information = Carparks.get_information!(id)
 

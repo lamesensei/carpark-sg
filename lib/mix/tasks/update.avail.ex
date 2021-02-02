@@ -36,14 +36,12 @@ defmodule Mix.Tasks.Update.Avail do
         |> List.first()
         |> Map.get("carpark_data", [])
         |> Enum.each(fn data ->
-          changeset =
-            Availability.changeset(%Availability{}, %{
-              car_park_no: data["carpark_number"],
-              carpark_info: data["carpark_info"],
-              update_datetime: data["update_datetime"]
-            })
-
-          Repo.insert(changeset)
+          Availability.changeset(%Availability{}, %{
+            car_park_no: data["carpark_number"],
+            carpark_info: data["carpark_info"],
+            update_datetime: data["update_datetime"]
+          })
+          |> Repo.insert()
         end)
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
