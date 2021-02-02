@@ -14,32 +14,36 @@ alias CarparkSg.Carparks.Information
 alias CarparkSg.Repo
 
 defmodule CarparkSeeder do
-  # def bulk_insert(data) do
-  #   now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-  #   bulk =
-  #     Enum.reduce(data, [], fn value, acc ->
-  #       merge =
-  #         Map.merge(value, %{
-  #           "inserted_at" => now,
-  #           "updated_at" => now
-  #         })
-
-  #       changeset = Information.changeset(%Information{}, merge)
-  #       [changeset | acc]
-  #     end)
-
-  #   # Enum.take(bulk, 1) |> IO.inspect()
-
-  #   Repo.insert_all(Information, bulk,
-  #     on_conflict: :replace_all,
-  #     conflict_target: [:id]
-  #   )
-  # end
+  @convert_url "https://developers.onemap.sg/commonapi/convert/3414to4326?"
 
   def insert(row) do
-    changeset = Information.changeset(%Information{}, row)
-    Repo.insert!(changeset)
+    row
+    |> convert_svy21()
+    |> changeset()
+    |> Repo.insert_or_update!()
+  end
+
+  defp changeset(data) do
+    Information.changeset(%Information{}, data)
+  end
+
+  defp convert_svy21(row) do
+    x = row["x_coord"]
+    y = row["y_coord"]
+
+    url = "#{@convert_url}X=#{x}&Y=#{y}"
+
+    case HTTPoison.get(url) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        json = Jason.decode!(body)
+        Map.merge(row, %{"lat" => json["latitude"], "lon" => json["longitude"]})
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        IO.puts("Not found :(")
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        IO.inspect(reason)
+    end
   end
 end
 
