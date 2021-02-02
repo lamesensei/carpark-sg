@@ -1,11 +1,14 @@
 use Mix.Config
 
+database_url = System.get_env("DATABASE_URL")
+
 # Configure your database
 config :carpark_sg, CarparkSg.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "carpark_sg_dev",
-  hostname: "localhost",
+  # username: "postgres",
+  # password: "postgres",
+  # database: "carpark_sg_dev",
+  # hostname: "localhost",
+  url: database_url,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
