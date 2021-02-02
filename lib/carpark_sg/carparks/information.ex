@@ -2,6 +2,8 @@ defmodule CarparkSg.Carparks.Information do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias CarparkSg.Carparks.Availability
+
   schema "carparks" do
     field(:address, :string)
     field(:car_park_basement, :string)
@@ -17,6 +19,8 @@ defmodule CarparkSg.Carparks.Information do
     field(:type_of_parking_system, :string)
     field(:x_coord, :float)
     field(:y_coord, :float)
+
+    has_one(:availability, Availability, foreign_key: :car_park_no, references: :car_park_no)
 
     timestamps()
   end

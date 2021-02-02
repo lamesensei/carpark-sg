@@ -18,7 +18,10 @@ defmodule CarparkSg.Carparks do
 
   """
   def list_carparks do
-    Repo.all(Information)
+    Information
+    |> limit(2)
+    |> Repo.all()
+    |> Repo.preload(:availability)
   end
 
   @doc """
@@ -35,7 +38,9 @@ defmodule CarparkSg.Carparks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_information!(id), do: Repo.get!(Information, id)
+  def get_information!(id) do
+    Repo.get!(Information, id) |> Repo.preload(:availability)
+  end
 
   @doc """
   Creates a information.
@@ -100,5 +105,101 @@ defmodule CarparkSg.Carparks do
   """
   def change_information(%Information{} = information, attrs \\ %{}) do
     Information.changeset(information, attrs)
+  end
+
+  alias CarparkSg.Carparks.Availability
+
+  @doc """
+  Returns the list of carpark_availability.
+
+  ## Examples
+
+      iex> list_carpark_availability()
+      [%Availability{}, ...]
+
+  """
+  def list_carpark_availability do
+    Repo.all(Availability)
+  end
+
+  @doc """
+  Gets a single availability.
+
+  Raises `Ecto.NoResultsError` if the Availability does not exist.
+
+  ## Examples
+
+      iex> get_availability!(123)
+      %Availability{}
+
+      iex> get_availability!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_availability!(id), do: Repo.get!(Availability, id)
+
+  @doc """
+  Creates a availability.
+
+  ## Examples
+
+      iex> create_availability(%{field: value})
+      {:ok, %Availability{}}
+
+      iex> create_availability(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_availability(attrs \\ %{}) do
+    %Availability{}
+    |> Availability.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a availability.
+
+  ## Examples
+
+      iex> update_availability(availability, %{field: new_value})
+      {:ok, %Availability{}}
+
+      iex> update_availability(availability, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_availability(%Availability{} = availability, attrs) do
+    availability
+    |> Availability.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a availability.
+
+  ## Examples
+
+      iex> delete_availability(availability)
+      {:ok, %Availability{}}
+
+      iex> delete_availability(availability)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_availability(%Availability{} = availability) do
+    Repo.delete(availability)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking availability changes.
+
+  ## Examples
+
+      iex> change_availability(availability)
+      %Ecto.Changeset{data: %Availability{}}
+
+  """
+  def change_availability(%Availability{} = availability, attrs \\ %{}) do
+    Availability.changeset(availability, attrs)
   end
 end
