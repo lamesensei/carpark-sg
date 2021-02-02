@@ -18,8 +18,8 @@ defmodule CarparkSg.Carparks.Availability do
   @doc false
   def changeset(availability, attrs) do
     availability
-    |> cast(attrs, [:carpark_info, :update_datetime])
-    |> validate_required([:carpark_info, :update_datetime])
-    |> unique_constraint(:car_park_no)
+    |> cast(attrs, [:carpark_info, :update_datetime, :car_park_no])
+    |> validate_required([:carpark_info, :update_datetime, :car_park_no])
+    |> foreign_key_constraint(:car_park_no)
   end
 end

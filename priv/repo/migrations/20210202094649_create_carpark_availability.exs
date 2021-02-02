@@ -10,6 +10,6 @@ defmodule CarparkSg.Repo.Migrations.CreateCarparkAvailability do
       timestamps()
     end
 
-    create unique_index(:carpark_availability, [:car_park_no])
+    create index(:carpark_availability, [:car_park_no])
   end
 end
