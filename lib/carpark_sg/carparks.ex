@@ -122,13 +122,14 @@ defmodule CarparkSg.Carparks do
     |> Repo.preload(:information)
     |> Enum.map(fn avail ->
       avail.carpark_info
-      |> combine_lots
+      |> combine_lots()
       |> Map.merge(avail)
+      |> shorten_float()
     end)
   end
 
-  defp combine_lots(capark_info) do
-    capark_info
+  defp combine_lots(object) do
+    object
     |> Enum.reduce(%{total_lots: 0, available_lots: 0}, fn info, acc ->
       %{
         acc
@@ -136,6 +137,21 @@ defmodule CarparkSg.Carparks do
           available_lots: String.to_integer(info["lots_available"]) + acc.available_lots
       }
     end)
+  end
+
+  defp shorten_float(object) do
+    Map.merge(object, %{
+      latitude: short_squeeze(object.information.lat),
+      longitude: short_squeeze(object.information.lon)
+    })
+  end
+
+  # lol wtf hahahahahhahaha
+  defp short_squeeze(float) do
+    Float.ceil(float, 5)
+    |> Float.to_string()
+    |> String.slice(0..6)
+    |> String.to_float()
   end
 
   @doc """

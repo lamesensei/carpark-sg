@@ -14,8 +14,8 @@ defmodule CarparkSgWeb.AvailabilityView do
     %{
       # car_park_no: availability.car_park_no,
       address: availability.information.address,
-      latitude: availability.information.lat,
-      longitude: availability.information.lon,
+      latitude: availability.latitude,
+      longitude: availability.longitude,
       available_lots: availability.available_lots,
       total_lots: availability.total_lots
       # distance: availability.distance

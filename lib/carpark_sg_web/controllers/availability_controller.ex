@@ -44,8 +44,8 @@ defmodule CarparkSgWeb.AvailabilityController do
   end
 
   def nearest(conn, params) do
-    lat = Map.get(params, "latitude", 1.39201)
-    lon = Map.get(params, "longitude", 103.89855)
+    lat = Map.get(params, "latitude", "0") |> String.to_float()
+    lon = Map.get(params, "longitude", "0") |> String.to_float()
     lat_lon = [lat, lon]
 
     carpark_availability =
