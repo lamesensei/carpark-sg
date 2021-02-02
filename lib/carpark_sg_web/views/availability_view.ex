@@ -18,6 +18,7 @@ defmodule CarparkSgWeb.AvailabilityView do
       longitude: availability.information.lon,
       available_lots: availability.available_lots,
       total_lots: availability.total_lots
+      # distance: availability.distance
       # update_datetime: availability.update_datetime
     }
   end

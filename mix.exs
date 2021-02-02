@@ -47,7 +47,8 @@ defmodule CarparkSg.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:csv, "~> 2.4"},
       {:httpoison, "~> 1.8"},
-      {:scrivener_ecto, "~> 2.0"}
+      {:scrivener_ecto, "~> 2.0"},
+      {:geocalc, "~> 0.5"}
     ]
   end
 

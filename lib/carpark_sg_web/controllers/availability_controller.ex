@@ -4,7 +4,7 @@ defmodule CarparkSgWeb.AvailabilityController do
   alias CarparkSg.Carparks
   alias CarparkSg.Carparks.Availability
 
-  action_fallback CarparkSgWeb.FallbackController
+  action_fallback(CarparkSgWeb.FallbackController)
 
   def index(conn, _params) do
     carpark_availability = Carparks.list_carpark_availability()
@@ -43,8 +43,29 @@ defmodule CarparkSgWeb.AvailabilityController do
     end
   end
 
-  def nearest(conn, _params) do
-    carpark_availability = Carparks.list_carpark_availability()
+  def nearest(conn, params) do
+    lat = Map.get(params, "latitude", 1.39201)
+    lon = Map.get(params, "longitude", 103.89855)
+    lat_lon = [lat, lon]
+
+    carpark_availability =
+      Carparks.list_carpark_availability()
+      |> Enum.map(fn item ->
+        append_distance(item, lat_lon)
+      end)
+      |> Enum.filter(fn item -> item.available_lots > 0 end)
+      |> Enum.sort_by(& &1.distance)
+
     render(conn, "index.json", carpark_availability: carpark_availability)
+  end
+
+  def append_distance(object, lat_lon) do
+    distance =
+      Geocalc.distance_between(
+        [object.information.lat, object.information.lon],
+        lat_lon
+      )
+
+    Map.merge(object, %{distance: distance})
   end
 end
