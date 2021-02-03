@@ -2,27 +2,32 @@ defmodule CarparkSgWeb.Router do
   use CarparkSgWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_flash)
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/", CarparkSgWeb do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    get "/", PageController, :index
+    get("/", PageController, :index)
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", CarparkSgWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", CarparkSgWeb do
+    pipe_through(:api)
+
+    get("/carparks/nearest", AvailabilityController, :nearest)
+    resources("/carparks", InformationController, except: [:new, :edit])
+
+    resources "/carpark_availability", AvailabilityController, except: [:new, :edit]
+  end
 
   # Enables LiveDashboard only for development
   #
@@ -35,8 +40,8 @@ defmodule CarparkSgWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/" do
-      pipe_through :browser
-      live_dashboard "/dashboard", metrics: CarparkSgWeb.Telemetry
+      pipe_through(:browser)
+      live_dashboard("/dashboard", metrics: CarparkSgWeb.Telemetry)
     end
   end
 end

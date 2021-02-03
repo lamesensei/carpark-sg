@@ -1,20 +1,26 @@
-# CarparkSg
+# CarparkSG
 
-To start your Phoenix server:
+## Todo
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Install Node.js dependencies with `npm install` inside the `assets` directory
-  * Start Phoenix endpoint with `mix phx.server`
+- Result pagination
+- Error handling
+  - lat/lon params
+  - pagination params
+  - error view
+- Bulk insert/update for availability data instead of delete_all
+- Code Documentation
+- This README
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Dev Commands Reference
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+Context Creation
 
-## Learn more
+```
+mix phx.gen.json Carparks Information carparks car_park_no:string:unique address:string x_coord:float y_coord:float car_park_type:string type_of_parking_system:string short_term_parking:string free_parking:string night_parking:string car_park_decks:integer gantry_height:float car_park_basement:string lat:float lon:float
+```
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Create avaibility model
+
+```
+mix phx.gen.json Carparks Availability carpark_availability carpark_info:array:map update_datetime:utc_datetime car_park_no:references:carparks:unique
+```

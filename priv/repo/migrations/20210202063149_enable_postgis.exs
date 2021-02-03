@@ -1,0 +1,15 @@
+defmodule CarparkSg.Repo.Migrations.EnablePostgis do
+  use Ecto.Migration
+
+  # def change do
+
+  # end
+
+  def up do
+    execute "CREATE EXTENSION IF NOT EXISTS postgis"
+  end
+
+  def down do
+    execute "DROP EXTENSION IF EXISTS postgis"
+  end
+end
