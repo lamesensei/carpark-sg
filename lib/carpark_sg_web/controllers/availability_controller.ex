@@ -3,6 +3,9 @@ defmodule CarparkSgWeb.AvailabilityController do
 
   alias CarparkSg.Carparks
   alias CarparkSg.Carparks.Availability
+  alias CarparkSg.Validation.NearestParams
+
+  plug(:ensure_nearest_params)
 
   action_fallback(CarparkSgWeb.FallbackController)
 
@@ -43,9 +46,23 @@ defmodule CarparkSgWeb.AvailabilityController do
     end
   end
 
-  def nearest(conn, params) do
+  def nearest(
+        conn,
+        %{
+          "latitude" => latitude,
+          "longitude" => longitude,
+          "per_page" => per_page,
+          "page" => page
+        } = params
+      ) do
+    render_nearest(conn, params)
+
+    # render(conn, "index.json", carpark_availability: carpark_availability)
+  end
+
+  defp render_nearest(conn, params) do
     page =
-      Map.put_new(params, "page_size", params["per_page"])
+      Map.put_new(params, "page_size", Map.get(params, "per_page", 0))
       |> Carparks.list_carpark_availability_nearest()
 
     render(conn, "paged.json",
@@ -55,7 +72,28 @@ defmodule CarparkSgWeb.AvailabilityController do
       total_pages: page.total_pages,
       total_entries: page.total_entries
     )
+  end
 
-    # render(conn, "index.json", carpark_availability: carpark_availability)
+  defp ensure_nearest_params(conn, _) do
+    changeset = NearestParams.changeset(%NearestParams{}, conn.params)
+
+    case changeset do
+      %{
+        :params => %{
+          "latitude" => latitude,
+          "longitude" => longitude,
+          "per_page" => per_page,
+          "page" => page
+        },
+        :valid? => true
+      } ->
+        conn
+
+      _ ->
+        conn
+        |> put_status(400)
+        |> put_view(CarparkSgWeb.ChangesetView)
+        |> render("error.json", %{changeset: changeset})
+    end
   end
 end
