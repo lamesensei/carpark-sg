@@ -4,8 +4,6 @@ defmodule Mix.Tasks.Update.Avail do
   alias CarparkSg.Carparks.Availability
   alias CarparkSg.Repo
 
-  import Ecto
-
   @api_url "https://api.data.gov.sg/v1/transport/carpark-availability"
   @shortdoc "Retrieves carpark availability data and store in database"
 

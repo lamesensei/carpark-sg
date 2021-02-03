@@ -49,5 +49,5 @@ end
 
 File.stream!(Path.join(:code.priv_dir(:carpark_sg), "repo/hdb-carpark-information.csv"))
 |> CSV.decode!(headers: true)
-# |> Enum.take(20)
+|> Enum.take(20)
 |> Enum.each(&CarparkSeeder.insert/1)

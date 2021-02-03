@@ -128,6 +128,17 @@ defmodule CarparkSg.Carparks do
     end)
   end
 
+  defp distance_query do
+
+select * from (
+SELECT  *,( 3959 * acos( cos( radians(6.414478) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(12.466646) ) + sin( radians(6.414478) ) * sin( radians( lat ) ) ) ) AS distance
+FROM station_location
+) al
+where distance < 5
+ORDER BY distance
+LIMIT 20;
+  end
+
   defp combine_lots(object) do
     object
     |> Enum.reduce(%{total_lots: 0, available_lots: 0}, fn info, acc ->
