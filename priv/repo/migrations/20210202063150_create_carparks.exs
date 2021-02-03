@@ -17,6 +17,7 @@ defmodule CarparkSg.Repo.Migrations.CreateCarparks do
       add(:car_park_basement, :string)
       add(:lat, :float)
       add(:lon, :float)
+      add(:geo, :geometry)
 
       timestamps()
     end

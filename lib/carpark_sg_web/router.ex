@@ -23,7 +23,7 @@ defmodule CarparkSgWeb.Router do
   scope "/api", CarparkSgWeb do
     pipe_through(:api)
 
-    get("/carparks/nearest", AvailabilityController, :nearest)
+    get("/carparks/nearest", InformationController, :nearest)
     resources("/carparks", InformationController, except: [:new, :edit])
 
     resources "/carpark_availability", AvailabilityController, except: [:new, :edit]

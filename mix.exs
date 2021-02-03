@@ -47,7 +47,8 @@ defmodule CarparkSg.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:csv, "~> 2.4"},
       {:httpoison, "~> 1.8"},
-      {:geocalc, "~> 0.5"}
+      {:geo, "~> 3.0"},
+      {:geo_postgis, "~> 3.1"}
     ]
   end
 

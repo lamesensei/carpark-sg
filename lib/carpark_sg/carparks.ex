@@ -4,6 +4,8 @@ defmodule CarparkSg.Carparks do
   """
 
   import Ecto.Query, warn: false
+  import Geo.PostGIS
+
   alias CarparkSg.Repo
 
   alias CarparkSg.Carparks.Information
@@ -128,15 +130,37 @@ defmodule CarparkSg.Carparks do
     end)
   end
 
-  defp distance_query do
+  def list_carpark_availability_nearest(params) do
+    %{"latitude" => latitude, "longitude" => longitude} = params
 
-select * from (
-SELECT  *,( 3959 * acos( cos( radians(6.414478) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(12.466646) ) + sin( radians(6.414478) ) * sin( radians( lat ) ) ) ) AS distance
-FROM station_location
-) al
-where distance < 5
-ORDER BY distance
-LIMIT 20;
+    geom = %Geo.Point{
+      coordinates: {longitude, latitude},
+      srid: 4326
+    }
+
+    query =
+      from information in Information,
+        order_by: st_distance(information.geo, ^geom),
+        select: information
+
+    Repo.all(query)
+    # |> Repo.preload(:)
+    # |> Enum.map(fn avail ->
+    #   avail.carpark_info
+    #   |> combine_lots()
+    #   |> Map.merge(avail)
+    #   |> shorten_float()
+    # end)
+  end
+
+  defp distance_query do
+    # select * from (
+    # SELECT  *,( 3959 * acos( cos( radians(6.414478) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(12.466646) ) + sin( radians(6.414478) ) * sin( radians( lat ) ) ) ) AS distance
+    # FROM station_location
+    # ) al
+    # where distance < 5
+    # ORDER BY distance
+    # LIMIT 20;
   end
 
   defp combine_lots(object) do

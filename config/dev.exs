@@ -10,7 +10,10 @@ config :carpark_sg, CarparkSg.Repo,
   # hostname: "localhost",
   url: database_url,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 10,
+  adapter: Ecto.Adapters.Postgres,
+  extensions: [{Geo.PostGIS.Extension, library: Geo}],
+  types: CarparkSg.PostgresTypes
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

@@ -42,31 +42,4 @@ defmodule CarparkSgWeb.AvailabilityController do
       send_resp(conn, :no_content, "")
     end
   end
-
-  def nearest(conn, params) do
-    # TODO this needs change
-    lat = Map.get(params, "latitude", "0.1") |> String.to_float()
-    lon = Map.get(params, "longitude", "0.1") |> String.to_float()
-    lat_lon = [lat, lon]
-
-    carpark_availability =
-      Carparks.list_carpark_availability()
-      |> Enum.map(fn item ->
-        append_distance(item, lat_lon)
-      end)
-      |> Enum.filter(fn item -> item.available_lots > 0 end)
-      |> Enum.sort_by(& &1.distance)
-
-    render(conn, "index.json", carpark_availability: carpark_availability)
-  end
-
-  def append_distance(object, lat_lon) do
-    distance =
-      Geocalc.distance_between(
-        [object.information.lat, object.information.lon],
-        lat_lon
-      )
-
-    Map.merge(object, %{distance: distance})
-  end
 end

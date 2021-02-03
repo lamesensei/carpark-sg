@@ -19,6 +19,7 @@ defmodule CarparkSg.Carparks.Information do
     field(:type_of_parking_system, :string)
     field(:x_coord, :float)
     field(:y_coord, :float)
+    field(:geo, Geo.PostGIS.Geometry)
 
     has_one(:availability, Availability, foreign_key: :car_park_no, references: :car_park_no)
 
@@ -42,7 +43,8 @@ defmodule CarparkSg.Carparks.Information do
       :gantry_height,
       :car_park_basement,
       :lat,
-      :lon
+      :lon,
+      :geo
     ])
     |> unique_constraint(:car_park_no)
 
