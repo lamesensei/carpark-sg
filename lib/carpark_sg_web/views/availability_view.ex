@@ -22,4 +22,20 @@ defmodule CarparkSgWeb.AvailabilityView do
       # update_datetime: availability.update_datetime
     }
   end
+
+  def render("paged.json", %{
+        entries: entries,
+        page_number: page_number,
+        page_size: page_size,
+        total_pages: total_pages,
+        total_entries: total_entries
+      }) do
+    %{
+      data: render_many(entries, AvailabilityView, "availability.json"),
+      page_number: page_number,
+      page_size: page_size,
+      total_pages: total_pages,
+      total_entries: total_entries
+    }
+  end
 end

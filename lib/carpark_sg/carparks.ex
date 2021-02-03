@@ -132,13 +132,14 @@ defmodule CarparkSg.Carparks do
       srid: 4326
     }
 
-    Repo.all(
+    query =
       from availability in Availability,
         join: information in assoc(availability, :information),
         order_by: st_distance(information.geom, ^geom),
         where: availability.available_lots > 0,
         preload: [information: information]
-    )
+
+    CarparkSg.Repo.paginate(query, params)
 
     # |> Enum.map(fn avail ->
     #   avail.carpark_info

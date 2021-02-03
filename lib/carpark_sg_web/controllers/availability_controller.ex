@@ -44,9 +44,18 @@ defmodule CarparkSgWeb.AvailabilityController do
   end
 
   def nearest(conn, params) do
-    # TODO this needs change
+    page =
+      Map.put_new(params, "page_size", params["per_page"])
+      |> Carparks.list_carpark_availability_nearest()
 
-    carpark_availability = Carparks.list_carpark_availability_nearest(params)
-    render(conn, "index.json", carpark_availability: carpark_availability)
+    render(conn, "paged.json",
+      entries: page.entries,
+      page_number: page.page_number,
+      page_size: page.page_size,
+      total_pages: page.total_pages,
+      total_entries: page.total_entries
+    )
+
+    # render(conn, "index.json", carpark_availability: carpark_availability)
   end
 end
