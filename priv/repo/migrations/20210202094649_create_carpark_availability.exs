@@ -5,6 +5,8 @@ defmodule CarparkSg.Repo.Migrations.CreateCarparkAvailability do
     create table(:carpark_availability) do
       add :carpark_info, {:array, :map}
       add :update_datetime, :utc_datetime
+      add :available_lots, :integer
+      add :total_lots, :integer
       add :car_park_no, references(:carparks, column: :car_park_no, type: :string, on_delete: :delete_all)
 
       timestamps()

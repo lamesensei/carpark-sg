@@ -7,8 +7,8 @@ defmodule CarparkSg.Carparks do
   import Geo.PostGIS
 
   alias CarparkSg.Repo
-
   alias CarparkSg.Carparks.Information
+  alias CarparkSg.Carparks.Availability
 
   @doc """
   Returns the list of carparks.
@@ -122,12 +122,6 @@ defmodule CarparkSg.Carparks do
   def list_carpark_availability do
     Repo.all(Availability)
     |> Repo.preload(:information)
-    |> Enum.map(fn avail ->
-      avail.carpark_info
-      |> combine_lots()
-      |> Map.merge(avail)
-      |> shorten_float()
-    end)
   end
 
   def list_carpark_availability_nearest(params) do
@@ -138,13 +132,14 @@ defmodule CarparkSg.Carparks do
       srid: 4326
     }
 
-    query =
-      from information in Information,
-        order_by: st_distance(information.geo, ^geom),
-        select: information
+    Repo.all(
+      from availability in Availability,
+        join: information in assoc(availability, :information),
+        order_by: st_distance(information.geom, ^geom),
+        where: availability.available_lots > 0,
+        preload: [information: information]
+    )
 
-    Repo.all(query)
-    # |> Repo.preload(:)
     # |> Enum.map(fn avail ->
     #   avail.carpark_info
     #   |> combine_lots()
@@ -153,41 +148,20 @@ defmodule CarparkSg.Carparks do
     # end)
   end
 
-  defp distance_query do
-    # select * from (
-    # SELECT  *,( 3959 * acos( cos( radians(6.414478) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(12.466646) ) + sin( radians(6.414478) ) * sin( radians( lat ) ) ) ) AS distance
-    # FROM station_location
-    # ) al
-    # where distance < 5
-    # ORDER BY distance
-    # LIMIT 20;
-  end
+  # defp shorten_float(object) do
+  #   Map.merge(object, %{
+  #     latitude: short_squeeze(object.information.lat),
+  #     longitude: short_squeeze(object.information.lon)
+  #   })
+  # end
 
-  defp combine_lots(object) do
-    object
-    |> Enum.reduce(%{total_lots: 0, available_lots: 0}, fn info, acc ->
-      %{
-        acc
-        | total_lots: String.to_integer(info["total_lots"]) + acc.total_lots,
-          available_lots: String.to_integer(info["lots_available"]) + acc.available_lots
-      }
-    end)
-  end
-
-  defp shorten_float(object) do
-    Map.merge(object, %{
-      latitude: short_squeeze(object.information.lat),
-      longitude: short_squeeze(object.information.lon)
-    })
-  end
-
-  # lol wtf hahahahahhahaha
-  defp short_squeeze(float) do
-    Float.ceil(float, 5)
-    |> Float.to_string()
-    |> String.slice(0..6)
-    |> String.to_float()
-  end
+  # # lol wtf hahahahahhahaha
+  # defp short_squeeze(float) do
+  #   Float.ceil(float, 5)
+  #   |> Float.to_string()
+  #   |> String.slice(0..6)
+  #   |> String.to_float()
+  # end
 
   @doc """
   Gets a single availability.

@@ -42,4 +42,11 @@ defmodule CarparkSgWeb.AvailabilityController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def nearest(conn, params) do
+    # TODO this needs change
+
+    carpark_availability = Carparks.list_carpark_availability_nearest(params)
+    render(conn, "index.json", carpark_availability: carpark_availability)
+  end
 end

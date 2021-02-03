@@ -34,11 +34,15 @@ defmodule Mix.Tasks.Update.Avail do
         |> List.first()
         |> Map.get("carpark_data", [])
         |> Enum.each(fn data ->
-          Availability.changeset(%Availability{}, %{
-            car_park_no: data["carpark_number"],
-            carpark_info: data["carpark_info"],
-            update_datetime: data["update_datetime"]
-          })
+          merged =
+            combine_lots(data["carpark_info"])
+            |> Map.merge(%{
+              "car_park_no" => data["carpark_number"],
+              "carpark_info" => data["carpark_info"],
+              "update_datetime" => data["update_datetime"]
+            })
+
+          Availability.changeset(%Availability{}, merged)
           |> Repo.insert()
         end)
 
@@ -48,6 +52,16 @@ defmodule Mix.Tasks.Update.Avail do
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect(reason)
     end
+  end
+
+  defp combine_lots(object) do
+    Enum.reduce(object, %{"total_lots" => 0, "available_lots" => 0}, fn info, acc ->
+      %{
+        acc
+        | "total_lots" => String.to_integer(info["total_lots"]) + acc["total_lots"],
+          "available_lots" => String.to_integer(info["lots_available"]) + acc["available_lots"]
+      }
+    end)
   end
 
   # We can define other functions as needed here.

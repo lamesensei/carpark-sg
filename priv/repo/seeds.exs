@@ -37,7 +37,7 @@ defmodule CarparkSeeder do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         coords = Jason.decode!(body)
 
-        geo = %Geo.Point{
+        geom = %Geo.Point{
           coordinates: {coords["longitude"], coords["latitude"]},
           srid: 4326
         }
@@ -45,7 +45,7 @@ defmodule CarparkSeeder do
         Map.merge(row, %{
           "lat" => coords["latitude"],
           "lon" => coords["longitude"],
-          "geo" => geo
+          "geom" => geom
         })
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
@@ -60,5 +60,5 @@ end
 Path.join(:code.priv_dir(:carpark_sg), "repo/hdb-carpark-information.csv")
 |> File.stream!()
 |> CSV.decode!(headers: true)
-# |> Enum.take(50)
+|> Enum.take(20 )
 |> Enum.each(&CarparkSeeder.insert/1)
