@@ -4,7 +4,7 @@ CarparkSG is a API for retrieving the nearest HDB carpark information/availabili
 
 ## Usage
 
-`GET` Returns carpark availability information in order based on distance.
+`GET` **/api/carparks/nearest**
 
 ```
 http://localhost:4000/api/carparks/nearest?latitude=1.2653&longitude=103.8189&per_page=5&page=1
@@ -121,11 +121,12 @@ mix update.avail
 ## TODO
 
 - Code docmentation
-- Seeding error handling
+- More robust error handling
+- Unit tests
 
 ## Remarks
 
-See [DEVELOPMENT.MD](development.md)
+See [journal.md](journal.md)
 
 ## License
 

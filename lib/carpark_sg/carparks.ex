@@ -140,13 +140,6 @@ defmodule CarparkSg.Carparks do
         preload: [information: information]
 
     CarparkSg.Repo.paginate(query, params)
-
-    # |> Enum.map(fn avail ->
-    #   avail.carpark_info
-    #   |> combine_lots()
-    #   |> Map.merge(avail)
-    #   |> shorten_float()
-    # end)
   end
 
   # defp shorten_float(object) do

@@ -14,13 +14,8 @@ defmodule Mix.Tasks.Update.Avail do
 
   def run(_args) do
     Mix.Task.run("app.start")
-    # delete_all()
     get_availability()
   end
-
-  # defp delete_all() do
-  #   Repo.delete_all(Availability)
-  # end
 
   defp get_availability() do
     {:ok, sg_now} = DateTime.now("Asia/Singapore")
@@ -41,7 +36,6 @@ defmodule Mix.Tasks.Update.Avail do
           json["items"]
           |> List.first()
           |> Map.get("carpark_data", [])
-          # |> Enum.take(5)
           |> Enum.reduce([], fn data, acc ->
             merged =
               combine_lots(data["carpark_info"])
