@@ -25,13 +25,13 @@ defmodule Mix.Tasks.Update.Avail do
   defp get_availability() do
     {:ok, sg_now} = DateTime.now("Asia/Singapore")
     sg_now = DateTime.to_iso8601(sg_now) |> String.slice(0..18)
-    # 'YYYY-MM-DD[T]HH:MM:SS
     url = @api_url <> "?date_time=#{sg_now}"
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
     carpark_nos = Information |> Repo.all() |> Enum.map(& &1.car_park_no)
-    IO.inspect(carpark_nos)
+
     HTTPoison.start()
+
+    IO.puts("Retrieving availability from API")
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -63,12 +63,18 @@ defmodule Mix.Tasks.Update.Avail do
           |> Enum.filter(fn change ->
             Enum.member?(carpark_nos, change.car_park_no)
           end)
+          # |> Enum.sort_by(& &1.update_datetime, {:desc, DateTime})
           |> Enum.uniq_by(& &1.car_park_no)
 
-        Repo.insert_all(Availability, new_data,
-          on_conflict: :replace_all,
-          conflict_target: [:car_park_no]
-        )
+        IO.puts("#{length(new_data)} update rows retrieved and processed. Preparing to insert")
+
+        case Repo.insert_all(Availability, new_data,
+               on_conflict: :replace_all,
+               conflict_target: [:car_park_no]
+             ) do
+          {rows, nil} -> IO.puts("#{rows} inserted!")
+          _ -> IO.puts("Something went wrong")
+        end
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
         IO.puts("Not found :(")

@@ -24,11 +24,11 @@ defmodule CarparkSeeder do
 
   def bulk_insert(rows) do
     IO.puts("SEEDING HDB CARPARK INFORMATION FROM CSV")
+    range = Enum.reduce(rows, 0, fn _row, acc -> acc + 1 end)
+    IO.puts("#{range} rows decoded! Please be patient.")
 
     bulk_data =
       Enum.reduce(rows, [], fn row, acc ->
-        IO.inspect(row)
-
         changeset =
           row
           |> convert_svy21
@@ -44,12 +44,15 @@ defmodule CarparkSeeder do
     IO.puts("#{length(bulk_data)} rows processed")
     IO.puts("Performing insert_all")
 
-    Repo.insert_all(
-      Information,
-      bulk_data
-      # on_conflict: :replace_all,
-      # conflict_target: [:car_park_no]
-    )
+    case Repo.insert_all(
+           Information,
+           bulk_data
+           # on_conflict: :replace_all,
+           # conflict_target: [:car_park_no]
+         ) do
+      {rows, nil} -> IO.puts("#{rows} inserted!")
+      _ -> IO.puts("Something went wrong")
+    end
   end
 
   defp append_dates(row) do
@@ -88,9 +91,14 @@ defmodule CarparkSeeder do
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
         IO.puts("Not found :(")
+        row
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect(reason)
+        row
+
+      _ ->
+        row
     end
   end
 end
