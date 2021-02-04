@@ -49,7 +49,8 @@ defmodule CarparkSg.MixProject do
       {:httpoison, "~> 1.8"},
       {:geo, "~> 3.0"},
       {:geo_postgis, "~> 3.1"},
-      {:scrivener_ecto, "~> 2.0"}
+      {:scrivener_ecto, "~> 2.0"},
+      {:tzdata, "~> 1.1"},
     ]
   end
 

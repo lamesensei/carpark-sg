@@ -9,9 +9,10 @@ defmodule CarparkSgWeb.Router do
     pipe_through(:api)
 
     get("/carparks/nearest", AvailabilityController, :nearest)
-    resources("/carparks", InformationController, except: [:new, :edit])
 
-    resources("/carpark_availability", AvailabilityController, except: [:new, :edit])
+    # resources("/carparks", InformationController, except: [:new, :edit]) do
+    #   resources("/availability", AvailabilityController, except: [:new, :edit])
+    # end
   end
 
   # Enables LiveDashboard only for development
