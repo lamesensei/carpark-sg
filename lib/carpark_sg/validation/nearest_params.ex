@@ -15,72 +15,57 @@ defmodule CarparkSg.Validation.NearestParams do
     nearest_params
     |> cast(attrs, [:latitude, :longitude, :per_page, :page])
     |> validate_required([:latitude, :longitude, :per_page, :page])
-    |> validate_string_is_float(:latitude)
-    |> validate_string_is_float(:longitude)
-    |> validate_string_is_integer(:per_page)
-    |> validate_string_is_integer(:page)
     |> validate_latitude(:latitude)
     |> validate_longitude(:longitude)
     |> validate_page(:page)
     |> validate_page(:per_page)
   end
 
-  defp validate_string_is_float(changeset, field) do
-    validate_change(changeset, field, fn field, value ->
-      try do
-        String.to_float(value)
-        []
-      rescue
-        e in ArgumentError ->
-          [{field, "Please provide a valid float"}]
-      end
-    end)
+  defp string_is_float(value) do
+    case Float.parse(value) do
+      {float, ""} -> {:ok, float}
+      {_float, _remainder} -> false
+      :error -> false
+    end
   end
 
-  defp validate_string_is_integer(changeset, field) do
-    validate_change(changeset, field, fn field, value ->
-      try do
-        String.to_integer(value)
-        []
-      rescue
-        e in ArgumentError ->
-          [{field, "Please provide a valid integer"}]
-      end
-    end)
+  defp string_is_integer(value) do
+    case Integer.parse(value) do
+      {integer, ""} -> {:ok, integer}
+      {_integer, _remainder} -> false
+      :error -> false
+    end
   end
 
   defp validate_latitude(changeset, field) do
     validate_change(changeset, field, fn field, value ->
-      lat = String.to_float(value)
-
-      if lat <= 90 and lat >= -90 do
+      with {:ok, float} <- string_is_float(value),
+           true <- float <= 90 and float >= -90 do
         []
       else
-        [{field, "Latitude should be between 90 and -90"}]
+        _ -> [{field, "Latitude should be between 90 and -90"}]
       end
     end)
   end
 
   defp validate_longitude(changeset, field) do
     validate_change(changeset, field, fn field, value ->
-      lon = String.to_float(value)
-
-      if lon <= 180 and lon >= -180 do
+      with {:ok, float} <- string_is_float(value),
+           true <- float <= 180 and float >= -180 do
         []
       else
-        [{field, "Longitude should be between 180 and -180"}]
+        _ -> [{field, "Longitude should be between 180 and -180"}]
       end
     end)
   end
 
   defp validate_page(changeset, field) do
     validate_change(changeset, field, fn field, value ->
-      page = String.to_integer(value)
-
-      if page > 0 do
+      with {:ok, integer} <- string_is_integer(value),
+           true <- integer > 0 do
         []
       else
-        [{field, "Pagination value should be above 0"}]
+        _ -> [{field, "Pagination value should be above 0"}]
       end
     end)
   end
