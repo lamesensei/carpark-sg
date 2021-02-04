@@ -16,11 +16,52 @@ alias CarparkSg.Repo
 defmodule CarparkSeeder do
   @convert_url "https://developers.onemap.sg/commonapi/convert/3414to4326?"
 
-  def insert(row) do
-    row
-    |> convert_svy21()
-    |> changeset()
-    |> Repo.insert_or_update!()
+  # def insert(row) do
+  #   changeset
+  #   |> convert_svy21()
+  #   |> changeset()
+  # end
+
+  def bulk_insert(rows) do
+    IO.puts("SEEDING HDB CARPARK INFORMATION FROM CSV")
+    range = Enum.reduce(rows, 0, fn _row, acc -> acc + 1 end)
+    IO.puts("#{range} rows decoded! Please be patient.")
+
+    bulk_data =
+      Enum.reduce(rows, [], fn row, acc ->
+        changeset =
+          row
+          |> convert_svy21
+          |> append_dates
+          |> changeset
+
+        case changeset.valid? do
+          true -> [changeset.changes | acc]
+          _ -> acc
+        end
+      end)
+
+    IO.puts("#{length(bulk_data)} rows processed")
+    IO.puts("Performing insert_all")
+
+    case Repo.insert_all(
+           Information,
+           bulk_data
+           # on_conflict: :replace_all,
+           # conflict_target: [:car_park_no]
+         ) do
+      {rows, nil} -> IO.puts("#{rows} inserted!")
+      _ -> IO.puts("Something went wrong")
+    end
+  end
+
+  defp append_dates(row) do
+    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+    Map.merge(row, %{
+      "updated_at" => now,
+      "inserted_at" => now
+    })
   end
 
   defp changeset(data) do
@@ -50,9 +91,14 @@ defmodule CarparkSeeder do
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
         IO.puts("Not found :(")
+        row
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect(reason)
+        row
+
+      _ ->
+        row
     end
   end
 end
@@ -60,5 +106,4 @@ end
 Path.join(:code.priv_dir(:carpark_sg), "repo/hdb-carpark-information.csv")
 |> File.stream!()
 |> CSV.decode!(headers: true)
-|> Enum.take(20 )
-|> Enum.each(&CarparkSeeder.insert/1)
+|> CarparkSeeder.bulk_insert()

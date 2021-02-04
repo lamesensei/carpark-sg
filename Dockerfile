@@ -5,9 +5,4 @@ WORKDIR /app
 COPY mix.exs .
 COPY mix.lock .
 
-RUN mkdir assets
-
-COPY assets/package.json assets
-COPY assets/package-lock.json assets
-
-CMD mix deps.get && cd assets && npm install && cd .. && mix ecto.reset && mix phx.server
+CMD mix deps.get && mix ecto.reset && mix update.avail && mix phx.server

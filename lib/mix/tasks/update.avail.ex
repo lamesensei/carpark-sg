@@ -2,6 +2,7 @@ defmodule Mix.Tasks.Update.Avail do
   use Mix.Task
 
   alias CarparkSg.Carparks.Availability
+  alias CarparkSg.Carparks.Information
   alias CarparkSg.Repo
 
   @api_url "https://api.data.gov.sg/v1/transport/carpark-availability"
@@ -13,38 +14,67 @@ defmodule Mix.Tasks.Update.Avail do
 
   def run(_args) do
     Mix.Task.run("app.start")
-    delete_all()
+    # delete_all()
     get_availability()
   end
 
-  defp delete_all() do
-    Repo.delete_all(Availability)
-  end
+  # defp delete_all() do
+  #   Repo.delete_all(Availability)
+  # end
 
   defp get_availability() do
-    url = @api_url
+    {:ok, sg_now} = DateTime.now("Asia/Singapore")
+    sg_now = DateTime.to_iso8601(sg_now) |> String.slice(0..18)
+    url = @api_url <> "?date_time=#{sg_now}"
+    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    carpark_nos = Information |> Repo.all() |> Enum.map(& &1.car_park_no)
 
     HTTPoison.start()
+
+    IO.puts("Retrieving availability from API")
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         json = Jason.decode!(body)
 
-        json["items"]
-        |> List.first()
-        |> Map.get("carpark_data", [])
-        |> Enum.each(fn data ->
-          merged =
-            combine_lots(data["carpark_info"])
-            |> Map.merge(%{
-              "car_park_no" => data["carpark_number"],
-              "carpark_info" => data["carpark_info"],
-              "update_datetime" => data["update_datetime"]
-            })
+        new_data =
+          json["items"]
+          |> List.first()
+          |> Map.get("carpark_data", [])
+          # |> Enum.take(5)
+          |> Enum.reduce([], fn data, acc ->
+            merged =
+              combine_lots(data["carpark_info"])
+              |> Map.merge(%{
+                "car_park_no" => data["carpark_number"],
+                "carpark_info" => data["carpark_info"],
+                "update_datetime" => data["update_datetime"],
+                "updated_at" => now,
+                "inserted_at" => now
+              })
 
-          Availability.changeset(%Availability{}, merged)
-          |> Repo.insert()
-        end)
+            changeset = Availability.changeset(%Availability{}, merged)
+
+            case changeset.valid? do
+              true -> [changeset.changes | acc]
+              _ -> acc
+            end
+          end)
+          |> Enum.filter(fn change ->
+            Enum.member?(carpark_nos, change.car_park_no)
+          end)
+          # |> Enum.sort_by(& &1.update_datetime, {:desc, DateTime})
+          |> Enum.uniq_by(& &1.car_park_no)
+
+        IO.puts("#{length(new_data)} update rows retrieved and processed. Preparing to insert")
+
+        case Repo.insert_all(Availability, new_data,
+               on_conflict: :replace_all,
+               conflict_target: [:car_park_no]
+             ) do
+          {rows, nil} -> IO.puts("#{rows} inserted!")
+          _ -> IO.puts("Something went wrong")
+        end
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
         IO.puts("Not found :(")
@@ -63,6 +93,4 @@ defmodule Mix.Tasks.Update.Avail do
       }
     end)
   end
-
-  # We can define other functions as needed here.
 end

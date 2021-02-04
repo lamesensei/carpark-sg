@@ -44,10 +44,13 @@ defmodule CarparkSg.Carparks.Information do
       :car_park_basement,
       :lat,
       :lon,
-      :geom
+      :geom,
+      :inserted_at,
+      :updated_at
     ])
     |> unique_constraint(:car_park_no)
 
+    # |> cast_assoc(:availability)
     # |> validate_required([:car_park_no, :address, :x_coord, :y_coord, :car_park_type, :type_of_parking_system, :short_term_parking, :free_parking, :night_parking, :car_park_decks, :gantry_height, :car_park_basement, :lat, :lon])
   end
 end
