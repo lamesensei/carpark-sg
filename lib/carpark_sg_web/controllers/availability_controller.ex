@@ -44,18 +44,9 @@ defmodule CarparkSgWeb.AvailabilityController do
     end
   end
 
-  def nearest(
-        conn,
-        %{
-          "latitude" => latitude,
-          "longitude" => longitude,
-          "per_page" => per_page,
-          "page" => page
-        } = params
-      ) do
+  def nearest(conn, params) do
+    ensure_nearest_params(params)
     render_nearest(conn, params)
-
-    # render(conn, "index.json", carpark_availability: carpark_availability)
   end
 
   defp render_nearest(conn, params) do
