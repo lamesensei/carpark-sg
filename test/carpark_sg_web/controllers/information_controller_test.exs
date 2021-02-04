@@ -18,7 +18,11 @@ defmodule CarparkSgWeb.InformationControllerTest do
     short_term_parking: "some short_term_parking",
     type_of_parking_system: "some type_of_parking_system",
     x_coord: 120.5,
-    y_coord: 120.5
+    y_coord: 120.5,
+    geom: %Geo.Point{
+      coordinates: {103.8189, 1.2653},
+      srid: 4326
+    }
   }
   @update_attrs %{
     address: "some updated address",
@@ -34,9 +38,29 @@ defmodule CarparkSgWeb.InformationControllerTest do
     short_term_parking: "some updated short_term_parking",
     type_of_parking_system: "some updated type_of_parking_system",
     x_coord: 456.7,
-    y_coord: 456.7
+    y_coord: 456.7,
+    geom: %Geo.Point{
+      coordinates: {102.8189, 1.3653},
+      srid: 4326
+    }
   }
-  @invalid_attrs %{address: nil, car_park_basement: nil, car_park_decks: nil, car_park_no: nil, car_park_type: nil, free_parking: nil, gantry_height: nil, lat: nil, lon: nil, night_parking: nil, short_term_parking: nil, type_of_parking_system: nil, x_coord: nil, y_coord: nil}
+  @invalid_attrs %{
+    address: nil,
+    car_park_basement: nil,
+    car_park_decks: nil,
+    car_park_no: nil,
+    car_park_type: nil,
+    free_parking: nil,
+    gantry_height: nil,
+    lat: nil,
+    lon: nil,
+    night_parking: nil,
+    short_term_parking: nil,
+    type_of_parking_system: nil,
+    x_coord: nil,
+    y_coord: nil,
+    geom: nil
+  }
 
   def fixture(:information) do
     {:ok, information} = Carparks.create_information(@create_attrs)
@@ -76,7 +100,8 @@ defmodule CarparkSgWeb.InformationControllerTest do
                "short_term_parking" => "some short_term_parking",
                "type_of_parking_system" => "some type_of_parking_system",
                "x_coord" => 120.5,
-               "y_coord" => 120.5
+               "y_coord" => 120.5,
+               "geom" => %{"coordinates" => [103.8189, 1.2653], "crs" => %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"}, "type" => "Point"}
              } = json_response(conn, 200)["data"]
     end
 
@@ -110,7 +135,8 @@ defmodule CarparkSgWeb.InformationControllerTest do
                "short_term_parking" => "some updated short_term_parking",
                "type_of_parking_system" => "some updated type_of_parking_system",
                "x_coord" => 456.7,
-               "y_coord" => 456.7
+               "y_coord" => 456.7,
+               "geom" => %{"coordinates" => [102.8189, 1.3653], "crs" => %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"}, "type" => "Point"}
              } = json_response(conn, 200)["data"]
     end
 

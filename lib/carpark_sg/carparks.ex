@@ -108,7 +108,7 @@ defmodule CarparkSg.Carparks do
     Information.changeset(information, attrs)
   end
 
-  alias CarparkSg.Carparks.Availability
+  # alias CarparkSg.Carparks.Availability
 
   @doc """
   Returns the list of carpark_availability.
@@ -133,11 +133,12 @@ defmodule CarparkSg.Carparks do
     }
 
     query =
-      from availability in Availability,
+      from(availability in Availability,
         join: information in assoc(availability, :information),
         order_by: st_distance(information.geom, ^geom),
         where: availability.available_lots > 0,
         preload: [information: information]
+      )
 
     CarparkSg.Repo.paginate(query, params)
   end
@@ -171,7 +172,7 @@ defmodule CarparkSg.Carparks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_availability!(id), do: Repo.get!(Availability, id)
+  # def get_availability!(id), do: Repo.get!(Availability, id)
 
   @doc """
   Creates a availability.
@@ -185,11 +186,11 @@ defmodule CarparkSg.Carparks do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_availability(attrs \\ %{}) do
-    %Availability{}
-    |> Availability.changeset(attrs)
-    |> Repo.insert()
-  end
+  # def create_availability(attrs \\ %{}) do
+  #   %Availability{}
+  #   |> Availability.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
   @doc """
   Updates a availability.
@@ -203,11 +204,11 @@ defmodule CarparkSg.Carparks do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_availability(%Availability{} = availability, attrs) do
-    availability
-    |> Availability.changeset(attrs)
-    |> Repo.update()
-  end
+  # def update_availability(%Availability{} = availability, attrs) do
+  #   availability
+  #   |> Availability.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
   @doc """
   Deletes a availability.
@@ -221,9 +222,9 @@ defmodule CarparkSg.Carparks do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_availability(%Availability{} = availability) do
-    Repo.delete(availability)
-  end
+  # def delete_availability(%Availability{} = availability) do
+  #   Repo.delete(availability)
+  # end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking availability changes.
@@ -234,7 +235,7 @@ defmodule CarparkSg.Carparks do
       %Ecto.Changeset{data: %Availability{}}
 
   """
-  def change_availability(%Availability{} = availability, attrs \\ %{}) do
-    Availability.changeset(availability, attrs)
-  end
+  # def change_availability(%Availability{} = availability, attrs \\ %{}) do
+  #   Availability.changeset(availability, attrs)
+  # end
 end

@@ -51,6 +51,22 @@ defmodule CarparkSg.Carparks.Information do
     |> unique_constraint(:car_park_no)
 
     # |> cast_assoc(:availability)
-    # |> validate_required([:car_park_no, :address, :x_coord, :y_coord, :car_park_type, :type_of_parking_system, :short_term_parking, :free_parking, :night_parking, :car_park_decks, :gantry_height, :car_park_basement, :lat, :lon])
+    |> validate_required([
+      :car_park_no,
+      :address,
+      :x_coord,
+      :y_coord,
+      :car_park_type,
+      :type_of_parking_system,
+      :short_term_parking,
+      :free_parking,
+      :night_parking,
+      :car_park_decks,
+      :gantry_height,
+      :car_park_basement,
+      :lat,
+      :lon,
+      :geom
+    ])
   end
 end
