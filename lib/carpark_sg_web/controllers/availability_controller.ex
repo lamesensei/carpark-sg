@@ -71,10 +71,10 @@ defmodule CarparkSgWeb.AvailabilityController do
     case changeset do
       %{
         :params => %{
-          "latitude" => latitude,
-          "longitude" => longitude,
-          "per_page" => per_page,
-          "page" => page
+          "latitude" => _latitude,
+          "longitude" => _longitude,
+          "per_page" => _per_page,
+          "page" => _page
         },
         :valid? => true
       } ->
