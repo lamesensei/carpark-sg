@@ -60,8 +60,6 @@ defmodule CarparkSgWeb.AvailabilityControllerTest do
     }
   }
 
-
-
   def fixture(:availability) do
     {:ok, _information} = Carparks.create_information(@create_information_attrs)
     {:ok, _updated_information} = Carparks.create_information(@update_information_attrs)
@@ -147,9 +145,59 @@ defmodule CarparkSgWeb.AvailabilityControllerTest do
       conn = delete(conn, Routes.availability_path(conn, :delete, availability))
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
+      assert_error_sent(404, fn ->
         get(conn, Routes.availability_path(conn, :show, availability))
-      end
+      end)
+    end
+  end
+
+  describe "show availability" do
+    setup [:create_availability]
+
+    test "show availability with nearest param", %{conn: conn, availability: availability} do
+      conn = get(conn, Routes.availability_path(conn, :show, availability, nearest: "true"))
+
+      assert json_response(conn, 200) == %{
+               "address" => "some address",
+               "available_lots" => 69,
+               "car_park_no" => "some car_park_no",
+               "latitude" => 120.5,
+               "longitude" => 120.5,
+               "total_lots" => 420
+             }
+    end
+  end
+
+  describe "nearest" do
+    test "list nearest availability", %{conn: conn} do
+      Carparks.create_information(@create_information_attrs)
+      conn = post(conn, Routes.availability_path(conn, :create), availability: @create_attrs)
+      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      conn = get(conn, Routes.availability_path(conn, :show, id, nearest: "true"))
+      availability = json_response(conn, 200)
+
+      conn =
+        get(
+          conn,
+          Routes.availability_path(conn, :list_nearest,
+            latitude: "1.2653",
+            longitude: "103.8189",
+            page: "1",
+            per_page: "1"
+          )
+        )
+
+      assert json_response(conn, 200) ==
+               %{
+                 "data" => [
+                   availability
+                 ],
+                 "page_number" => 1,
+                 "page_size" => 1,
+                 "total_entries" => 1,
+                 "total_pages" => 1
+               }
     end
   end
 

@@ -21,6 +21,11 @@ defmodule CarparkSgWeb.AvailabilityController do
     end
   end
 
+  def show(conn, %{"id" => id, "nearest" => "true"}) do
+    availability = Carparks.get_availability!(id)
+    render(conn, "nearest.json", availability: availability)
+  end
+
   def show(conn, %{"id" => id}) do
     availability = Carparks.get_availability!(id)
     render(conn, "show.json", availability: availability)
@@ -43,7 +48,7 @@ defmodule CarparkSgWeb.AvailabilityController do
     end
   end
 
-  def nearest(conn, params) do
+  def list_nearest(conn, params) do
     page = Carparks.list_carpark_availability_nearest(params)
 
     render(conn, "paged.json",
