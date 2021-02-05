@@ -28,7 +28,6 @@ defmodule CarparkSgWeb.InformationView do
       lat: information.lat,
       lon: information.lon,
       geom: information.geom
-      # availbility_id: information.availability.car_park_no
     }
   end
 end

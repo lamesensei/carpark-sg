@@ -172,7 +172,7 @@ defmodule CarparkSg.Carparks do
       ** (Ecto.NoResultsError)
 
   """
-  # def get_availability!(id), do: Repo.get!(Availability, id)
+  def get_availability!(id), do: Repo.get!(Availability, id)
 
   @doc """
   Creates a availability.
@@ -186,11 +186,11 @@ defmodule CarparkSg.Carparks do
       {:error, %Ecto.Changeset{}}
 
   """
-  # def create_availability(attrs \\ %{}) do
-  #   %Availability{}
-  #   |> Availability.changeset(attrs)
-  #   |> Repo.insert()
-  # end
+  def create_availability(attrs \\ %{}) do
+    %Availability{}
+    |> Availability.changeset(attrs)
+    |> Repo.insert()
+  end
 
   @doc """
   Updates a availability.
@@ -204,11 +204,11 @@ defmodule CarparkSg.Carparks do
       {:error, %Ecto.Changeset{}}
 
   """
-  # def update_availability(%Availability{} = availability, attrs) do
-  #   availability
-  #   |> Availability.changeset(attrs)
-  #   |> Repo.update()
-  # end
+  def update_availability(%Availability{} = availability, attrs) do
+    availability
+    |> Availability.changeset(attrs)
+    |> Repo.update()
+  end
 
   @doc """
   Deletes a availability.
@@ -222,9 +222,9 @@ defmodule CarparkSg.Carparks do
       {:error, %Ecto.Changeset{}}
 
   """
-  # def delete_availability(%Availability{} = availability) do
-  #   Repo.delete(availability)
-  # end
+  def delete_availability(%Availability{} = availability) do
+    Repo.delete(availability)
+  end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking availability changes.
@@ -235,7 +235,7 @@ defmodule CarparkSg.Carparks do
       %Ecto.Changeset{data: %Availability{}}
 
   """
-  # def change_availability(%Availability{} = availability, attrs \\ %{}) do
-  #   Availability.changeset(availability, attrs)
-  # end
+  def change_availability(%Availability{} = availability, attrs \\ %{}) do
+    Availability.changeset(availability, attrs)
+  end
 end
