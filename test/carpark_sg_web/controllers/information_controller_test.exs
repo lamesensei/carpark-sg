@@ -86,7 +86,7 @@ defmodule CarparkSgWeb.InformationControllerTest do
       conn = get(conn, Routes.information_path(conn, :show, id))
 
       assert %{
-               "id" => id,
+               "id" => _id,
                "address" => "some address",
                "car_park_basement" => "some car_park_basement",
                "car_park_decks" => 42,
@@ -101,7 +101,11 @@ defmodule CarparkSgWeb.InformationControllerTest do
                "type_of_parking_system" => "some type_of_parking_system",
                "x_coord" => 120.5,
                "y_coord" => 120.5,
-               "geom" => %{"coordinates" => [103.8189, 1.2653], "crs" => %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"}, "type" => "Point"}
+               "geom" => %{
+                 "coordinates" => [103.8189, 1.2653],
+                 "crs" => %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"},
+                 "type" => "Point"
+               }
              } = json_response(conn, 200)["data"]
     end
 
@@ -114,14 +118,19 @@ defmodule CarparkSgWeb.InformationControllerTest do
   describe "update information" do
     setup [:create_information]
 
-    test "renders information when data is valid", %{conn: conn, information: %Information{id: id} = information} do
-      conn = put(conn, Routes.information_path(conn, :update, information), information: @update_attrs)
+    test "renders information when data is valid", %{
+      conn: conn,
+      information: %Information{id: id} = information
+    } do
+      conn =
+        put(conn, Routes.information_path(conn, :update, information), information: @update_attrs)
+
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, Routes.information_path(conn, :show, id))
 
       assert %{
-               "id" => id,
+               "id" => _id,
                "address" => "some updated address",
                "car_park_basement" => "some updated car_park_basement",
                "car_park_decks" => 43,
@@ -136,12 +145,18 @@ defmodule CarparkSgWeb.InformationControllerTest do
                "type_of_parking_system" => "some updated type_of_parking_system",
                "x_coord" => 456.7,
                "y_coord" => 456.7,
-               "geom" => %{"coordinates" => [102.8189, 1.3653], "crs" => %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"}, "type" => "Point"}
+               "geom" => %{
+                 "coordinates" => [102.8189, 1.3653],
+                 "crs" => %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"},
+                 "type" => "Point"
+               }
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn, information: information} do
-      conn = put(conn, Routes.information_path(conn, :update, information), information: @invalid_attrs)
+      conn =
+        put(conn, Routes.information_path(conn, :update, information), information: @invalid_attrs)
+
       assert json_response(conn, 422)["errors"] != %{}
     end
   end

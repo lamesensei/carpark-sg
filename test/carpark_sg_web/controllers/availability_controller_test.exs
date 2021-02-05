@@ -87,7 +87,7 @@ defmodule CarparkSgWeb.AvailabilityControllerTest do
       conn = get(conn, Routes.availability_path(conn, :show, id))
 
       assert %{
-               "id" => id,
+               "id" => _id,
                "carpark_info" => [],
                "update_datetime" => "2010-04-17T14:00:00Z",
                "available_lots" => 69,
@@ -119,7 +119,7 @@ defmodule CarparkSgWeb.AvailabilityControllerTest do
       conn = get(conn, Routes.availability_path(conn, :show, id))
 
       assert %{
-               "id" => id,
+               "id" => ^id,
                "carpark_info" => [%{"BRUH" => "BRUUH"}],
                "update_datetime" => "2011-05-18T15:01:01Z",
                "available_lots" => 68,

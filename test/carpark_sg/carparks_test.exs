@@ -290,7 +290,7 @@ defmodule CarparkSg.CarparksTest do
     end
 
     test "list_carpark_availability_nearest/1 with invalid params returns error changeset" do
-      availability = availability_fixture()
+      _availability = availability_fixture()
 
       assert {:error, %Ecto.Changeset{}} =
                Carparks.list_carpark_availability_nearest(@invalid_nearest_params)

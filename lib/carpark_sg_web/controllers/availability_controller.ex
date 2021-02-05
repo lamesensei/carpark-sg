@@ -49,14 +49,20 @@ defmodule CarparkSgWeb.AvailabilityController do
   end
 
   def list_nearest(conn, params) do
-    page = Carparks.list_carpark_availability_nearest(params)
-
-    render(conn, "paged.json",
-      entries: page.entries,
-      page_number: page.page_number,
-      page_size: page.page_size,
-      total_pages: page.total_pages,
-      total_entries: page.total_entries
-    )
+    with %Scrivener.Page{
+           entries: entries,
+           page_number: page_number,
+           page_size: page_size,
+           total_entries: total_entries,
+           total_pages: total_pages
+         } <- Carparks.list_carpark_availability_nearest(params) do
+      render(conn, "paged.json",
+        entries: entries,
+        page_number: page_number,
+        page_size: page_size,
+        total_pages: total_pages,
+        total_entries: total_entries
+      )
+    end
   end
 end

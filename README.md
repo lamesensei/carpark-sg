@@ -118,11 +118,18 @@ mix run priv/repo/seeds.exs
 mix update.avail
 ```
 
+### Testing
+
+Run tests with `mix test`
+
+```
+MIX_ENV=test mix test
+```
+
 ## TODO
 
-- Code docmentation
-- More robust error handling
-- Unit tests
+- Code documentation
+- More robust error handling?
 
 ## Remarks
 
