@@ -1,6 +1,5 @@
 defmodule CarparkSg.CarparksTest do
   use CarparkSg.DataCase
-
   alias CarparkSg.Carparks
 
   describe "carparks" do
@@ -62,13 +61,6 @@ defmodule CarparkSg.CarparksTest do
       x_coord: nil,
       y_coord: nil,
       geom: nil
-    }
-
-    @valid_params %{
-      latitude: "1.3",
-      longitude: "100",
-      per_page: "8",
-      page: "1"
     }
 
     def information_fixture(attrs \\ %{}, changes \\ @information_valid_attrs) do
@@ -181,14 +173,36 @@ defmodule CarparkSg.CarparksTest do
     @availability_valid_attrs %{
       carpark_info: [],
       update_datetime: "2010-04-17T14:00:00Z",
-      car_park_no: "some car_park_no"
+      car_park_no: "some car_park_no",
+      available_lots: 50,
+      total_lots: 100
     }
     @availability_update_attrs %{
       carpark_info: [%{"updated" => true}],
       update_datetime: "2011-05-18T15:01:01Z",
-      car_park_no: "some updated car_park_no"
+      car_park_no: "some updated car_park_no",
+      available_lots: 99,
+      total_lots: 100
     }
-    @availability_invalid_attrs %{carpark_info: nil, update_datetime: nil, car_park_no: nil}
+    @availability_invalid_attrs %{
+      carpark_info: nil,
+      update_datetime: nil,
+      car_park_no: nil,
+      available_lots: 0,
+      total_lots: 0
+    }
+    @valid_nearest_params %{
+      "latitude" => "1.2453",
+      "longitude" => "102.8189",
+      "per_page" => "8",
+      "page" => "1"
+    }
+    @invalid_nearest_params %{
+      "latitude" => "1.3a",
+      "longitude" => "100b",
+      "per_page" => nil,
+      "page" => "one"
+    }
 
     def availability_fixture(attrs \\ %{}) do
       _information = information_fixture()
@@ -261,6 +275,25 @@ defmodule CarparkSg.CarparksTest do
     test "change_availability/1 returns a availability changeset" do
       availability = availability_fixture()
       assert %Ecto.Changeset{} = Carparks.change_availability(availability)
+    end
+
+    test "list_carpark_availability_nearest/1 with valid params returns scrinever.page" do
+      availability = availability_fixture()
+
+      assert Carparks.list_carpark_availability_nearest(@valid_nearest_params) == %Scrivener.Page{
+               entries: [availability],
+               page_number: 1,
+               page_size: 8,
+               total_entries: 1,
+               total_pages: 1
+             }
+    end
+
+    test "list_carpark_availability_nearest/1 with invalid params returns error changeset" do
+      availability = availability_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Carparks.list_carpark_availability_nearest(@invalid_nearest_params)
     end
   end
 end
