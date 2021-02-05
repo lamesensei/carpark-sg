@@ -9,6 +9,7 @@ defmodule CarparkSg.Carparks do
   alias CarparkSg.Repo
   alias CarparkSg.Carparks.Information
   alias CarparkSg.Carparks.Availability
+  alias CarparkSg.Validation.NearestParams
 
   @doc """
   Returns the list of carparks.
@@ -108,7 +109,7 @@ defmodule CarparkSg.Carparks do
     Information.changeset(information, attrs)
   end
 
-  alias CarparkSg.Carparks.Availability
+  # alias CarparkSg.Carparks.Availability
 
   @doc """
   Returns the list of carpark_availability.
@@ -124,39 +125,6 @@ defmodule CarparkSg.Carparks do
     |> Repo.preload(:information)
   end
 
-  def list_carpark_availability_nearest(params) do
-    %{"latitude" => latitude, "longitude" => longitude} = params
-
-    geom = %Geo.Point{
-      coordinates: {longitude, latitude},
-      srid: 4326
-    }
-
-    query =
-      from availability in Availability,
-        join: information in assoc(availability, :information),
-        order_by: st_distance(information.geom, ^geom),
-        where: availability.available_lots > 0,
-        preload: [information: information]
-
-    CarparkSg.Repo.paginate(query, params)
-  end
-
-  # defp shorten_float(object) do
-  #   Map.merge(object, %{
-  #     latitude: short_squeeze(object.information.lat),
-  #     longitude: short_squeeze(object.information.lon)
-  #   })
-  # end
-
-  # # lol wtf hahahahahhahaha
-  # defp short_squeeze(float) do
-  #   Float.ceil(float, 5)
-  #   |> Float.to_string()
-  #   |> String.slice(0..6)
-  #   |> String.to_float()
-  # end
-
   @doc """
   Gets a single availability.
 
@@ -171,7 +139,9 @@ defmodule CarparkSg.Carparks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_availability!(id), do: Repo.get!(Availability, id)
+  def get_availability!(id) do
+    Repo.get!(Availability, id) |> Repo.preload(:information)
+  end
 
   @doc """
   Creates a availability.
@@ -237,4 +207,51 @@ defmodule CarparkSg.Carparks do
   def change_availability(%Availability{} = availability, attrs \\ %{}) do
     Availability.changeset(availability, attrs)
   end
+
+  def list_carpark_availability_nearest(params) do
+    changeset = NearestParams.changeset(%NearestParams{}, params)
+
+    case changeset.valid? do
+      true ->
+        %{
+          "latitude" => latitude,
+          "longitude" => longitude,
+          "page" => page,
+          "per_page" => per_page
+        } = params
+
+        geom = %Geo.Point{
+          coordinates: {longitude, latitude},
+          srid: 4326
+        }
+
+        query =
+          from(availability in Availability,
+            join: information in assoc(availability, :information),
+            order_by: st_distance(information.geom, ^geom),
+            where: availability.available_lots > 0,
+            preload: [information: information]
+          )
+
+        CarparkSg.Repo.paginate(query, %{page: page, page_size: per_page})
+
+      _ ->
+        {:error, changeset}
+    end
+  end
+
+  # defp shorten_float(object) do
+  #   Map.merge(object, %{
+  #     latitude: short_squeeze(object.information.lat),
+  #     longitude: short_squeeze(object.information.lon)
+  #   })
+  # end
+
+  # # lol wtf hahahahahhahaha
+  # defp short_squeeze(float) do
+  #   Float.ceil(float, 5)
+  #   |> Float.to_string()
+  #   |> String.slice(0..6)
+  #   |> String.to_float()
+  # end
 end
