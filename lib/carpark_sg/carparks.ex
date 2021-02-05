@@ -172,7 +172,9 @@ defmodule CarparkSg.Carparks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_availability!(id), do: Repo.get!(Availability, id)
+  def get_availability!(id) do
+    Repo.get!(Availability, id) |> Repo.preload(:information)
+  end
 
   @doc """
   Creates a availability.

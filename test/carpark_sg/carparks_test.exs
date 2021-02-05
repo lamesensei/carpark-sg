@@ -6,7 +6,7 @@ defmodule CarparkSg.CarparksTest do
   describe "carparks" do
     alias CarparkSg.Carparks.Information
 
-    @valid_attrs %{
+    @information_valid_attrs %{
       address: "some address",
       car_park_basement: "some car_park_basement",
       car_park_decks: 42,
@@ -26,7 +26,7 @@ defmodule CarparkSg.CarparksTest do
         srid: 4326
       }
     }
-    @update_attrs %{
+    @information_update_attrs %{
       address: "some updated address",
       car_park_basement: "some updated car_park_basement",
       car_park_decks: 43,
@@ -46,7 +46,7 @@ defmodule CarparkSg.CarparksTest do
         srid: 4326
       }
     }
-    @invalid_attrs %{
+    @information_invalid_attrs %{
       address: nil,
       car_park_basement: nil,
       car_park_decks: nil,
@@ -71,173 +71,196 @@ defmodule CarparkSg.CarparksTest do
       page: "1"
     }
 
-    def information_fixture(attrs \\ %{}) do
+    def information_fixture(attrs \\ %{}, changes \\ @information_valid_attrs) do
       {:ok, information} =
         attrs
-        |> Enum.into(@valid_attrs)
+        |> Enum.into(changes)
         |> Carparks.create_information()
 
-      information
+      information |> Repo.preload(:availability)
     end
 
+    test "list_carparks/0 returns all carparks" do
+      information = information_fixture()
 
-    # test "list_carparks/0 returns all carparks" do
-    #   information = information_fixture()
-    #   assert Carparks.list_carparks() == [information]
-    # end
+      assert Carparks.list_carparks() == [information]
+    end
 
     # test "list_carpark_availability_nearest/1 returns availabilities" do
     #   assert Carparks.list_carpark_availability_nearest(@valid_params) == []
     # end
 
-    #   test "get_information!/1 returns the information with given id" do
-    #     information = information_fixture()
-    #     assert Carparks.get_information!(information.id) == information
-    #   end
+    test "get_information!/1 returns the information with given id" do
+      information =
+        information_fixture()
+        |> Map.put(:availability, nil)
 
-    #   test "create_information/1 with valid data creates a information" do
-    #     assert {:ok, %Information{} = information} = Carparks.create_information(@valid_attrs)
-    #     assert information.address == "some address"
-    #     assert information.car_park_basement == "some car_park_basement"
-    #     assert information.car_park_decks == 42
-    #     assert information.car_park_no == "some car_park_no"
-    #     assert information.car_park_type == "some car_park_type"
-    #     assert information.free_parking == "some free_parking"
-    #     assert information.gantry_height == 120.5
-    #     assert information.lat == 120.5
-    #     assert information.lon == 120.5
-    #     assert information.night_parking == "some night_parking"
-    #     assert information.short_term_parking == "some short_term_parking"
-    #     assert information.type_of_parking_system == "some type_of_parking_system"
-    #     assert information.x_coord == 120.5
-    #     assert information.y_coord == 120.5
+      assert Carparks.get_information!(information.id) == information
+    end
 
-    #     assert information.geom == %Geo.Point{
-    #              coordinates: {102.8189, 1.2453},
-    #              srid: 4326
-    #            }
-    #   end
+    test "create_information/1 with valid data creates a information" do
+      assert {:ok, %Information{} = information} =
+               Carparks.create_information(@information_valid_attrs)
 
-    #   test "create_information/1 with invalid data returns error changeset" do
-    #     assert {:error, %Ecto.Changeset{}} = Carparks.create_information(@invalid_attrs)
-    #   end
+      assert information.address == "some address"
+      assert information.car_park_basement == "some car_park_basement"
+      assert information.car_park_decks == 42
+      assert information.car_park_no == "some car_park_no"
+      assert information.car_park_type == "some car_park_type"
+      assert information.free_parking == "some free_parking"
+      assert information.gantry_height == 120.5
+      assert information.lat == 120.5
+      assert information.lon == 120.5
+      assert information.night_parking == "some night_parking"
+      assert information.short_term_parking == "some short_term_parking"
+      assert information.type_of_parking_system == "some type_of_parking_system"
+      assert information.x_coord == 120.5
+      assert information.y_coord == 120.5
 
-    #   test "update_information/2 with valid data updates the information" do
-    #     information = information_fixture()
+      assert information.geom == %Geo.Point{
+               coordinates: {102.8189, 1.2453},
+               srid: 4326
+             }
+    end
 
-    #     assert {:ok, %Information{} = information} =
-    #              Carparks.update_information(information, @update_attrs)
+    test "create_information/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Carparks.create_information(@information_invalid_attrs)
+    end
 
-    #     assert information.address == "some updated address"
-    #     assert information.car_park_basement == "some updated car_park_basement"
-    #     assert information.car_park_decks == 43
-    #     assert information.car_park_no == "some updated car_park_no"
-    #     assert information.car_park_type == "some updated car_park_type"
-    #     assert information.free_parking == "some updated free_parking"
-    #     assert information.gantry_height == 456.7
-    #     assert information.lat == 456.7
-    #     assert information.lon == 456.7
-    #     assert information.night_parking == "some updated night_parking"
-    #     assert information.short_term_parking == "some updated short_term_parking"
-    #     assert information.type_of_parking_system == "some updated type_of_parking_system"
-    #     assert information.x_coord == 456.7
-    #     assert information.y_coord == 456.7
+    test "update_information/2 with valid data updates the information" do
+      information = information_fixture()
 
-    #     assert information.geom == %Geo.Point{
-    #              coordinates: {103.8189, 1.2653},
-    #              srid: 4326
-    #            }
-    #   end
+      assert {:ok, %Information{} = information} =
+               Carparks.update_information(information, @information_update_attrs)
 
-    #   test "update_information/2 with invalid data returns error changeset" do
-    #     information = information_fixture()
+      assert information.address == "some updated address"
+      assert information.car_park_basement == "some updated car_park_basement"
+      assert information.car_park_decks == 43
+      assert information.car_park_no == "some updated car_park_no"
+      assert information.car_park_type == "some updated car_park_type"
+      assert information.free_parking == "some updated free_parking"
+      assert information.gantry_height == 456.7
+      assert information.lat == 456.7
+      assert information.lon == 456.7
+      assert information.night_parking == "some updated night_parking"
+      assert information.short_term_parking == "some updated short_term_parking"
+      assert information.type_of_parking_system == "some updated type_of_parking_system"
+      assert information.x_coord == 456.7
+      assert information.y_coord == 456.7
 
-    #     assert {:error, %Ecto.Changeset{}} =
-    #              Carparks.update_information(information, @invalid_attrs)
+      assert information.geom == %Geo.Point{
+               coordinates: {103.8189, 1.2653},
+               srid: 4326
+             }
+    end
 
-    #     assert information == Carparks.get_information!(information.id)
-    #   end
+    test "update_information/2 with invalid data returns error changeset" do
+      information = information_fixture()
 
-    #   test "delete_information/1 deletes the information" do
-    #     information = information_fixture()
-    #     assert {:ok, %Information{}} = Carparks.delete_information(information)
-    #     assert_raise Ecto.NoResultsError, fn -> Carparks.get_information!(information.id) end
-    #   end
+      assert {:error, %Ecto.Changeset{}} =
+               Carparks.update_information(information, @information_invalid_attrs)
 
-    #   test "change_information/1 returns a information changeset" do
-    #     information = information_fixture()
-    #     assert %Ecto.Changeset{} = Carparks.change_information(information)
-    #   end
-    # end
+      assert information == Carparks.get_information!(information.id)
+    end
 
-    # describe "carpark_availability" do
-    #   alias CarparkSg.Carparks.Availability
+    test "delete_information/1 deletes the information" do
+      information = information_fixture()
+      assert {:ok, %Information{}} = Carparks.delete_information(information)
+      assert_raise Ecto.NoResultsError, fn -> Carparks.get_information!(information.id) end
+    end
 
-    #   @valid_attrs %{carpark_info: [], update_datetime: "2010-04-17T14:00:00Z"}
-    #   @update_attrs %{carpark_info: [], update_datetime: "2011-05-18T15:01:01Z"}
-    #   @invalid_attrs %{carpark_info: nil, update_datetime: nil}
+    test "change_information/1 returns a information changeset" do
+      information = information_fixture()
+      assert %Ecto.Changeset{} = Carparks.change_information(information)
+    end
+  end
 
-    #   def availability_fixture(attrs \\ %{}) do
-    #     {:ok, availability} =
-    #       attrs
-    #       |> Enum.into(@valid_attrs)
-    #       |> Carparks.create_availability()
+  describe "carpark_availability" do
+    alias CarparkSg.Carparks.Availability
 
-    #     availability
-    #   end
+    @availability_valid_attrs %{
+      carpark_info: [],
+      update_datetime: "2010-04-17T14:00:00Z",
+      car_park_no: "some car_park_no"
+    }
+    @availability_update_attrs %{
+      carpark_info: [%{"updated" => true}],
+      update_datetime: "2011-05-18T15:01:01Z",
+      car_park_no: "some updated car_park_no"
+    }
+    @availability_invalid_attrs %{carpark_info: nil, update_datetime: nil, car_park_no: nil}
 
-    #   test "list_carpark_availability/0 returns all carpark_availability" do
-    #     availability = availability_fixture()
-    #     assert Carparks.list_carpark_availability() == [availability]
-    #   end
+    def availability_fixture(attrs \\ %{}) do
+      _information = information_fixture()
 
-    #   test "get_availability!/1 returns the availability with given id" do
-    #     availability = availability_fixture()
-    #     assert Carparks.get_availability!(availability.id) == availability
-    #   end
+      {:ok, availability} =
+        attrs
+        |> Enum.into(@availability_valid_attrs)
+        |> Carparks.create_availability()
 
-    #   test "create_availability/1 with valid data creates a availability" do
-    #     assert {:ok, %Availability{} = availability} = Carparks.create_availability(@valid_attrs)
-    #     assert availability.carpark_info == []
+      availability |> Repo.preload(:information)
+    end
 
-    #     assert availability.update_datetime ==
-    #              DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
-    #   end
+    test "list_carpark_availability/0 returns all carpark_availability" do
+      availability = availability_fixture()
+      assert Carparks.list_carpark_availability() == [availability]
+    end
 
-    #   test "create_availability/1 with invalid data returns error changeset" do
-    #     assert {:error, %Ecto.Changeset{}} = Carparks.create_availability(@invalid_attrs)
-    #   end
+    test "get_availability!/1 returns the availability with given id" do
+      availability = availability_fixture()
+      assert Carparks.get_availability!(availability.id) == availability
+    end
 
-    #   test "update_availability/2 with valid data updates the availability" do
-    #     availability = availability_fixture()
+    test "create_availability/1 with valid data creates a availability" do
+      _information = information_fixture()
 
-    #     assert {:ok, %Availability{} = availability} =
-    #              Carparks.update_availability(availability, @update_attrs)
+      assert {:ok, %Availability{} = availability} =
+               Carparks.create_availability(@availability_valid_attrs)
 
-    #     assert availability.carpark_info == []
+      assert availability.carpark_info == []
 
-    #     assert availability.update_datetime ==
-    #              DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
-    #   end
+      assert availability.update_datetime ==
+               DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
+    end
 
-    #   test "update_availability/2 with invalid data returns error changeset" do
-    #     availability = availability_fixture()
+    test "create_availability/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} =
+               Carparks.create_availability(@availability_invalid_attrs)
+    end
 
-    #     assert {:error, %Ecto.Changeset{}} =
-    #              Carparks.update_availability(availability, @invalid_attrs)
+    test "update_availability/2 with valid data updates the availability" do
+      _updated_information = information_fixture(%{}, @information_update_attrs)
+      availability = availability_fixture()
 
-    #     assert availability == Carparks.get_availability!(availability.id)
-    #   end
+      assert {:ok, %Availability{} = availability} =
+               Carparks.update_availability(availability, @availability_update_attrs)
 
-    #   test "delete_availability/1 deletes the availability" do
-    #     availability = availability_fixture()
-    #     assert {:ok, %Availability{}} = Carparks.delete_availability(availability)
-    #     assert_raise Ecto.NoResultsError, fn -> Carparks.get_availability!(availability.id) end
-    #   end
+      assert availability.carpark_info == [%{"updated" => true}]
 
-    #   test "change_availability/1 returns a availability changeset" do
-    #     availability = availability_fixture()
-    #     assert %Ecto.Changeset{} = Carparks.change_availability(availability)
-    #   end
+      assert availability.update_datetime ==
+               DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
+
+      assert availability.car_park_no == "some updated car_park_no"
+    end
+
+    test "update_availability/2 with invalid data returns error changeset" do
+      availability = availability_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Carparks.update_availability(availability, @availability_invalid_attrs)
+
+      assert availability == Carparks.get_availability!(availability.id)
+    end
+
+    test "delete_availability/1 deletes the availability" do
+      availability = availability_fixture()
+      assert {:ok, %Availability{}} = Carparks.delete_availability(availability)
+      assert_raise Ecto.NoResultsError, fn -> Carparks.get_availability!(availability.id) end
+    end
+
+    test "change_availability/1 returns a availability changeset" do
+      availability = availability_fixture()
+      assert %Ecto.Changeset{} = Carparks.change_availability(availability)
+    end
   end
 end
