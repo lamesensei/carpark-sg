@@ -138,3 +138,9 @@ Once the code was stable, refactored the seeder for Information as well to use i
 ### testing
 
 I didn't do TDD so now I'm stuck with a bunch of preconfigured tests that don't work T.T
+
+## Day 4
+
+### Unit testing
+
+Decided to slowly comment all the test and rework them one by one. Got a better understanding of pattern matching and structs. Refactored some of controller code due to the tests. Guess I got some TDD done lol.
